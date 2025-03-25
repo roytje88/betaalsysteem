@@ -1,0 +1,9 @@
+*.xlsx
+*.xls
+build/
+dist/
+sales.db
+*.db
+test*
+*.ipynb
+app.spec*
