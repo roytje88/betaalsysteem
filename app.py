@@ -47,7 +47,10 @@ def generate_excel():
     if df.empty:
         return None
     df = df.rename(columns={'salesnumber': 'Verkoopnummer', 'verkopernummer': 'Verkoper', 'price': 'Prijs'}).drop(columns=['id'])
-    totalDF = df[['Verkoper', 'Prijs']].groupby('Verkoper').sum()
+    totalDF = df.groupby('Verkoper').agg({
+        'Prijs': ['sum','count']
+    }).rename(columns={'sum': 'Totaalbedrag', 'count': 'Unieke items'})
+    totalDF.columns = ['Totaalbedrag', 'Unieke items']
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, sheet_name="Raw Data", index=False)
@@ -100,7 +103,35 @@ app.layout = html.Div([
 
     html.Br(), html.Br(),
 
-    html.Div(id="status_message", style={"color": "blue", "font-weight": "bold"})
+    html.Div(id="status_message", style={"color": "blue", "font-weight": "bold"}),
+
+html.Div([
+    html.Span("© 2025 Verkoopsysteem™ - Roy van Rhedenburg | "),
+    
+    html.A(
+        "View the source code on GitHub", 
+        href="https://github.com/roytje88/betaalsysteem", 
+        target="_blank", 
+        style={"marginRight": "10px", 'display': 'inline-block'}
+    ),
+    
+    html.Span("This application is licensed under the GNU General Public License v3.0. "),
+    
+    html.A(
+        "Learn more about the GPL License", 
+        href="https://www.gnu.org/licenses/gpl-3.0.html", 
+        target="_blank",
+        style={"display": "inline-block"}
+    )
+    
+], style={
+    "fontSize": "12px",
+    "color": "gray",
+    "textAlign": "center",
+    "marginTop": "50px",
+    "borderTop": "1px solid #eee",
+    "paddingTop": "10px"
+})
 ])
 
 # **Unified Callback to Handle Sales Table, Sales Number Check, and Save Sale**
